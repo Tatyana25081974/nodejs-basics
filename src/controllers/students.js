@@ -3,6 +3,7 @@ import createHttpError from 'http-errors';
 import { getAllStudents, getStudentById } from '../services/students.js';
 import { createStudent } from '../services/students.js';
 import { deleteStudent } from "../services/students.js";
+import { updateStudent } from "../services/students.js";
 
 export const getStudentsController = async (req, res) => {
  const students = await getAllStudents();
@@ -60,3 +61,41 @@ export const deleteStudentController = async (req, res, next) => {
 
   res.status(204).send();
 };
+//upsert = update + insert. оновлюємо +створюємо
+
+  export const upsertStudentController = async (req, res, next) => { 
+    const { studentId } = req.params; // Отримуємо айді студента
+  
+    const result = await updateStudent(studentId, req.body, {  // req.body — нові дані студента (повинні бути в тілі запиту )
+      upsert: true, // каже MongoDB: якщо немає такого студента — створи нового. Якщо такий студент існує -оновлюємо його дані
+    });
+  
+    if (!result) {
+      next(createHttpError(404, 'Student not found'));
+      return;
+    }
+  
+    const status = result.isNew ? 201 : 200; //201 - створено, 200 - оновлено 
+  
+    res.status(status).json({
+      status, //повертаємо 201 якщо створено, 200 якщо оновлено 
+      message: `Successfully upserted a student!`,
+      data: result.student, //повертаємо студента 
+    });
+};
+export const patchStudentController = async (req, res, next) => {
+  const { studentId } = req.params;
+  const result = await updateStudent(studentId, req.body);
+
+  if (!result) {
+    next(createHttpError(404, 'Student not found'));
+    return;
+  }
+
+  res.json({
+    status: 200,
+    message: `Successfully patched a student!`,
+    data: result.student,
+  });
+};
+

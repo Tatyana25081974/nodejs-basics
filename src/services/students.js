@@ -23,3 +23,23 @@ export const deleteStudent = async (studentId) => {
 
   return student;
 };
+export const updateStudent = async (studentId, payload, options = {}) => {
+  const rawResult = await StudentsCollection.findOneAndUpdate(
+    { _id: studentId },// ID студента, якого потрібно оновити.
+    payload, //об’єкт з новими даними для оновлення
+    {
+      new: true,  //повертає оновлений документ відмінно від оригинального
+      includeResultMetadata: true, //повертає метадані оновленого документа 
+      ...options, //додаткові опциї
+    },
+  );
+ //Перевірка результату:
+  if (!rawResult || !rawResult.value) return null;
+  //Якщо документ не знайдено або не оновлено, функція поверне null
+  
+  //Повертаємо об'єкт, що містить оновленного студента та інформацію про його стан
+  return {
+    student: rawResult.value, //оновлений студент з бази даних
+    isNew: Boolean(rawResult?.lastErrorObject?.upserted), //повертає true,якщо документ створено і false,якщо документ оновлено з бази даних
+  };
+};
