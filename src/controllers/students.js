@@ -3,9 +3,16 @@ import createHttpError from 'http-errors';
 import { getAllStudents, getStudentById } from '../services/students.js';
 import { createStudent } from '../services/students.js';
 import { deleteStudent } from "../services/students.js";
+import { updateStudent } from "../services/students.js";
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+
 
 export const getStudentsController = async (req, res) => {
- const students = await getAllStudents();
+  const { page, perPage } = parsePaginationParams(req.query);
+  const students = await getAllStudents({
+    page,
+    perPage,
+ });
 
  res.json({
  status: 200,
@@ -59,4 +66,41 @@ export const deleteStudentController = async (req, res, next) => {
   }
 
   res.status(204).send();
+};
+
+export const upsertStudentController = async (req, res, next) => {
+  const { studentId } = req.params; // знаходимо id стулента 
+
+  const result = await updateStudent(studentId, req.body, {
+    upsert: true,
+  });   //оновлюємо студента
+
+  if (!result) {
+    next(createHttpError(404, 'Student not found'));
+    return;
+  } // якщо незнайдено студена -відправляємо помилку 
+
+  const status = result.isNew ? 201 : 200; // відправляємо 201
+
+  res.status(status).json({
+    status,
+    message: `Successfully upserted a student!`,
+    data: result.student,
+  }); //відправляємо 200
+};
+
+export const patchStudentController = async (req, res, next) => {
+  const { studentId } = req.params;
+  const result = await updateStudent(studentId, req.body);
+
+  if (!result) {
+    next(createHttpError(404, 'Student not found'));
+    return;
+  }
+
+  res.json({
+    status: 200,
+    message: `Successfully patched a student!`,
+    data: result.student,
+  });
 };
