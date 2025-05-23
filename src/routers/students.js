@@ -1,10 +1,6 @@
 // src/routers/students.js 
 
 import { Router } from 'express';
-import { validateBody } from '../middlewares/validateBody.js'; //кастомний middleware, який буде виконувати валідацію тіла запиту.
-import { createStudentSchema } from '../validation/students.js'; //Joi-схема, яка описує правила для об'єкта студента.
-import { updateStudentSchema } from '../validation/students.js';
-import { isValidId } from '../middlewares/isValidId.js';
 
 import {
   getStudentsController,
@@ -14,15 +10,21 @@ import {
   upsertStudentController,
   patchStudentController,
 } from '../controllers/students.js';
+
 import { ctrlWrapper } from '../utils/ctrlWrapper.js'; //утиліта для обгортки контролерів. Вона автоматично ловить помилки у async/await функціях і передає їх у next(error).
+import { validateBody } from '../middlewares/validateBody.js'; //кастомний middleware, який буде виконувати валідацію тіла запиту.
+import { isValidId } from '../middlewares/isValidId.js';
+import { createStudentSchema } from '../validation/students.js'; //Joi-схема, яка описує правила для об'єкта студента.
+import { updateStudentSchema } from '../validation/students.js';
+
 
 const router = Router();
 
-router.get('/students', ctrlWrapper(getStudentsController));
+router.get('/', ctrlWrapper(getStudentsController));
 
-router.get('/students/:studentId',isValidId, ctrlWrapper(getStudentByIdController));
+router.get('/:studentId',isValidId, ctrlWrapper(getStudentByIdController));
 
-router.post('/students', validateBody(createStudentSchema),ctrlWrapper(createStudentController));  //Це middleware-функція, яка:
+router.post('/', validateBody(createStudentSchema),ctrlWrapper(createStudentController));  //Це middleware-функція, яка:
 
 //перевіряє req.body за схемою createStudentSchema;
 
@@ -30,16 +32,16 @@ router.post('/students', validateBody(createStudentSchema),ctrlWrapper(createStu
 
 //якщо все ок — передає управління далі.
 
-router.delete('/students/:studentId', ctrlWrapper(deleteStudentController));
+router.delete('/:studentId', ctrlWrapper(deleteStudentController));
 
 router.put(
-  '/students/:studentId',
+  '/:studentId',
   isValidId,
   validateBody(createStudentSchema),
   ctrlWrapper(upsertStudentController),
 );
 router.patch(
-  '/students/:studentId',
+  '/:studentId',
   isValidId,
   validateBody(updateStudentSchema),
   ctrlWrapper(patchStudentController),

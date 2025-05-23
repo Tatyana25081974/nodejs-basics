@@ -6,7 +6,7 @@ import express from 'express'; //головна бібліотека для ст
 import pino from 'pino-http'; //логер, який виводить інформацію про запити (наприклад: метод, шлях, час).
 import cors from 'cors'; //дозволяє іншим сайтам звертатись до твого API (дуже важливо для фронтенду).
 
-import studentsRouter from './routers/students.js'; // Імпортуємо роутер
+import router from './routers/index.js'; // Імпортуємо роутер
 import { getEnvVar } from './utils/getEnvVar.js';
 
 // Імпортуємо middleware
@@ -25,7 +25,7 @@ export const startServer = () => {
   //Налаштування middleware (середовища для обробки запитів)
   app.use(express.json()); //Всі вхідні запити з JSON тілом (наприклад, POST) будуть автоматично розпарсені.
   app.use(cors());//Дозволяє frontend-додаткам з інших доменів (наприклад, localhost:5173) звертатися до API (localhost:3000).
-
+//підключення логера
   app.use(
     pino({
       transport: {
@@ -41,7 +41,7 @@ export const startServer = () => {
     });
   });
 // Підключення роутера для /students
-  app.use(studentsRouter); // Додаємо роутер до app як middleware
+app.use(router); // Додаємо роутер до app як middleware
 //Обробка 404 (неіснуючі маршрути)
   app.use('*', notFoundHandler);
 //Обробка помилок
