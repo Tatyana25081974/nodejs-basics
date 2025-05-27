@@ -16,15 +16,18 @@ import { validateBody } from '../middlewares/validateBody.js'; //кастомн�
 import { isValidId } from '../middlewares/isValidId.js';
 import { createStudentSchema } from '../validation/students.js'; //Joi-схема, яка описує правила для об'єкта студента.
 import { updateStudentSchema } from '../validation/students.js';
-
+import { authenticate } from '../middlewares/authenticate.js';
+import { checkRoles } from '../middlewares/checkRoles.js';
+import { ROLES } from '../constants/index.js';
 
 const router = Router();
+router.use(authenticate);
 
-router.get('/', ctrlWrapper(getStudentsController));
+router.get('/',checkRoles(ROLES.TEACHER), ctrlWrapper(getStudentsController));
 
-router.get('/:studentId',isValidId, ctrlWrapper(getStudentByIdController));
+router.get('/:studentId',checkRoles(ROLES.TEACHER, ROLES.PARENT),isValidId, ctrlWrapper(getStudentByIdController));
 
-router.post('/', validateBody(createStudentSchema),ctrlWrapper(createStudentController));  //Це middleware-функція, яка:
+router.post('/',checkRoles(ROLES.TEACHER), validateBody(createStudentSchema),ctrlWrapper(createStudentController));  //Це middleware-функція, яка:
 
 //перевіряє req.body за схемою createStudentSchema;
 
@@ -32,16 +35,16 @@ router.post('/', validateBody(createStudentSchema),ctrlWrapper(createStudentCont
 
 //якщо все ок — передає управління далі.
 
-router.delete('/:studentId', ctrlWrapper(deleteStudentController));
+router.delete('/:studentId', checkRoles(ROLES.TEACHER),isValidId, ctrlWrapper(deleteStudentController));
 
 router.put(
-  '/:studentId',
+  '/:studentId',checkRoles(ROLES.TEACHER),
   isValidId,
   validateBody(createStudentSchema),
   ctrlWrapper(upsertStudentController),
 );
 router.patch(
-  '/:studentId',
+  '/:studentId',(ROLES.TEACHER, ROLES.PARENT),
   isValidId,
   validateBody(updateStudentSchema),
   ctrlWrapper(patchStudentController),
@@ -49,11 +52,3 @@ router.patch(
 
 export default router;
 
-//Чому такий порядок?
-//Express виконує middleware зліва направо, тому:
-
-//Спочатку перевіряємо, чи studentId — валідний (isValidId)
-
-//Потім валідуємо req.body, якщо є (validateBody(...))
-
-//І тільки після цього — викликаємо контролер (ctrlWrapper(...))

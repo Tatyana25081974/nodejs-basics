@@ -5,6 +5,9 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js'; //утіліта для �
 import { registerUserSchema } from '../validation/auth.js';//Joi-схема, яка  описує правила для об'єкта користувача 
 import { registerUserController } from '../controllers/auth.js';//контролер який відповідає за реєстрацію користувача .отримує req, обробляє реєстрацію користувача через сервіс, і повертає JSON-відповідь.
 import { validateBody } from '../middlewares/validateBody.js';//кастомний middleware, який буде виконувати валідацію тіла запиту.middleware, який перевіряє, чи тіло запиту (req.body) відповідає схемі registerUserSchema.
+import { loginUserSchema} from '../validation/auth.js';
+import { loginUserController } from '../controllers/auth.js';
+import { logoutUserController } from '../controllers/auth.js';
 
 const router = Router();
 
@@ -13,5 +16,12 @@ router.post(
   validateBody(registerUserSchema), //спочатку перевіряються дані (валідація)
   ctrlWrapper(registerUserController),//потім виконується логіка реєстрації користувача
 );
+
+router.post(
+  '/login',
+  validateBody(loginUserSchema),
+  ctrlWrapper(loginUserController),
+);
+router.post('/logout', ctrlWrapper(logoutUserController));
 
 export default router;

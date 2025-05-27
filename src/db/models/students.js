@@ -25,6 +25,10 @@ const studentsSchema = new Schema(
       required: true,
       default: false,
     },
+    parentId: { // нова властивість 
+      type: Schema.Types.ObjectId, 
+      ref: 'users' //Вказує, що parentId посилається на документ в колекції users
+    },  
   },
   {
     timestamps: true,  // встановлює значення true, щоб автоматично створювати поля createdAt та updatedAt, які вказують на час створення та оновлення документа.

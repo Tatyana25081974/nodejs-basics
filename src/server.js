@@ -12,6 +12,7 @@ import { getEnvVar } from './utils/getEnvVar.js';
 // Імпортуємо middleware
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import cookieParser from 'cookie-parser';
 
 
 //Отримуємо порт, на якому запускатиметься сервер
@@ -25,7 +26,8 @@ export const startServer = () => {
   //Налаштування middleware (середовища для обробки запитів)
   app.use(express.json()); //Всі вхідні запити з JSON тілом (наприклад, POST) будуть автоматично розпарсені.
   app.use(cors());//Дозволяє frontend-додаткам з інших доменів (наприклад, localhost:5173) звертатися до API (localhost:3000).
-//підключення логера
+  //підключення логера
+  app.use(cookieParser());
   app.use(
     pino({
       transport: {
