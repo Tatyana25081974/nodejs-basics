@@ -1,5 +1,5 @@
 // src/services/students.js 
-import { StudentsCollection } from '../db/models/student.js';
+import { StudentsCollection } from '../db/models/students.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
 

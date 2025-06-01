@@ -44,7 +44,8 @@ router.put(
   ctrlWrapper(upsertStudentController),
 );
 router.patch(
-  '/:studentId',(ROLES.TEACHER, ROLES.PARENT),
+  '/:studentId',
+  checkRoles(ROLES.TEACHER, ROLES.PARENT), // ✅ Виправлено!checkRoles(...) — це middleware, який перевіряє роль користувача.
   isValidId,
   validateBody(updateStudentSchema),
   ctrlWrapper(patchStudentController),

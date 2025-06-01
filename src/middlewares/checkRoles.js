@@ -2,7 +2,7 @@
 
 import createHttpError from 'http-errors';
 
-import { StudentsCollection } from '../db/models/student.js';
+import { StudentsCollection } from '../db/models/students.js';
 import { ROLES } from '../constants/index.js';
 //Прийняття ролей:
 export const checkRoles =  //Функція checkRoles приймає необмежену кількість ролей як аргументи і повертає асинхронну функцію-обробник запиту.

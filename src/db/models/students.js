@@ -1,4 +1,4 @@
- // src/db/models/student.js 
+ // src/db/models/students.js 
 import { Schema, model } from 'mongoose';
 
 const studentsSchema = new Schema(
